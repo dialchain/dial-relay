@@ -23,7 +23,6 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<spring-boot.version>2.3.3.RELEASE</spring-boot.version>
-		<micrometer.version>1.5.1</micrometer.version>
 		<springdoc-openapi-ui.version>1.5.0</springdoc-openapi-ui.version>
 		<commons-lang3.version>3.11</commons-lang3.version>
 	</properties>
@@ -55,11 +54,6 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>io.micrometer</groupId>
-				<artifactId>micrometer-registry-prometheus</artifactId>
-				<version>${micrometer.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-ui</artifactId>

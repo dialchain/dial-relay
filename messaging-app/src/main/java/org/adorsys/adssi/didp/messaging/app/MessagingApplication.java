@@ -23,12 +23,6 @@ public class MessagingApplication {
 
 	private static void printAppInfo(Environment env) throws UnknownHostException {
 		String protocol = "http";
-		String serverSslEnabled = env.getProperty("server.ssl.enabled");
-		if (env.getProperty("server.ssl.key-store") != null
-			&& serverSslEnabled != null
-			&& serverSslEnabled.equals("true")) {
-			protocol = "https";
-		}
 
 		//@formatter:off
 		log.info("\n----------------------------------------------------------\n\t" +
