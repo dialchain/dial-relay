@@ -1,0 +1,8 @@
+didp:
+  messaging:
+    security:
+      signature:
+        ttl: PT1M
+        enabled: true
+        digest: SHA2_512
+        bits: 60

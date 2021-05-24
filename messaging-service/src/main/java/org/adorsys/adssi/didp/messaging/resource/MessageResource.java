@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class MessageResource {
-    private static final String PROOF_OF_POSSESSION_HEADER = "X-POP";
-    private static final String PROOF_OF_POSSESSION_TIMESTAMP_HEADER = "X-POP-TIMESTAMP";
+    public static final String PROOF_OF_POSSESSION_HEADER = "X-POP";
+    public static final String PROOF_OF_POSSESSION_TIMESTAMP_HEADER = "X-POP-TIMESTAMP";
 
     private final MessageService messageService;
     private final SecurityService securityService;

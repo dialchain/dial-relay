@@ -23,6 +23,6 @@ didp:
     security:
       signature:
         ttl: PT1M
-        enabled: true
-        digest: SHA3_512
+        enabled: false
+        digest: SHA2_512
         bits: 60
