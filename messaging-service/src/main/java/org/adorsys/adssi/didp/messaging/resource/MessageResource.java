@@ -1,29 +1,35 @@
 package org.adorsys.adssi.didp.messaging.resource;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.adorsys.adssi.didp.messaging.service.MessageService;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.adorsys.adssi.didp.messaging.service.SecurityService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class MessageResource {
-    private final MessageService messageService;
+    private static final String PROOF_OF_POSSESSION_HEADER = "X-POP";
+    private static final String PROOF_OF_POSSESSION_TIMESTAMP_HEADER = "X-POP-TIMESTAMP";
 
-    public MessageResource(MessageService messageService) {
+    private final MessageService messageService;
+    private final SecurityService securityService;
+
+    public MessageResource(MessageService messageService, SecurityService securityService) {
         this.messageService = messageService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/messages/{sender}/{recipient}/{messageId}")
     public String receive(
-        final @PathVariable("sender") String sender,
-        final @PathVariable("recipient") String recipient,
-        final @PathVariable("messageId") String messageId) {
+            final @PathVariable("sender") String sender,
+            final @PathVariable("recipient") String recipient,
+            final @PathVariable("messageId") String messageId,
+            final @RequestHeader(PROOF_OF_POSSESSION_HEADER) String recipientPopHeader,
+            final @RequestHeader(PROOF_OF_POSSESSION_TIMESTAMP_HEADER) Instant popTimestamp) {
+        securityService.assertSignature(recipientPopHeader, sender, recipient, messageId, popTimestamp, recipient);
         return messageService.get(sender, recipient, messageId);
     }
 
@@ -31,7 +37,12 @@ public class MessageResource {
     public Map<String, String> receive(
         final @PathVariable("sender") String sender,
         final @PathVariable("recipient") String recipient,
-        final @PathVariable("messageIds") String[] messageIds) {
+        final @PathVariable("messageIds") String[] messageIds,
+        final @RequestHeader(PROOF_OF_POSSESSION_HEADER) String recipientPopHeaders,
+        final @RequestHeader(PROOF_OF_POSSESSION_TIMESTAMP_HEADER) Instant popTimestamp) {
+        var signatures = recipientPopHeaders.split(",");
+        IntStream.range(0, messageIds.length)
+                .forEach(pos -> securityService.assertSignature(signatures[pos], sender, recipient, messageIds[pos], popTimestamp, recipient));
         return messageService.get(sender, recipient, List.of(messageIds));
     }
 
@@ -40,7 +51,10 @@ public class MessageResource {
         final @PathVariable("sender") String sender,
         final @PathVariable("recipient") String recipient,
         final @PathVariable("messageId") String messageId,
-        final @RequestBody String message) {
+        final @RequestBody String message,
+        final @RequestHeader(PROOF_OF_POSSESSION_HEADER) String senderPopHeader,
+        final @RequestHeader(PROOF_OF_POSSESSION_TIMESTAMP_HEADER) Instant popTimestamp) {
+        securityService.assertSignature(senderPopHeader, sender, recipient, messageId, popTimestamp, sender);
         return messageService.set(sender, recipient, messageId, message);
     }
 
@@ -48,7 +62,10 @@ public class MessageResource {
     public Boolean delete(
         final @PathVariable("sender") String sender,
         final @PathVariable("recipient") String recipient,
-        final @PathVariable("messageId") String messageId) {
+        final @PathVariable("messageId") String messageId,
+        final @RequestHeader(PROOF_OF_POSSESSION_HEADER) String recipientPopHeader,
+        final @RequestHeader(PROOF_OF_POSSESSION_TIMESTAMP_HEADER) Instant popTimestamp) {
+        securityService.assertSignature(recipientPopHeader, sender, recipient, messageId, popTimestamp, recipient);
         return messageService.delete(sender, recipient, messageId);
     }
 }

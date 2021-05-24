@@ -17,3 +17,12 @@ management:
     web:
       exposure:
         include: health
+
+didp:
+  messaging:
+    security:
+      signature:
+        ttl: PT1M
+        enabled: true
+        digest: SHA3_512
+        bits: 60
