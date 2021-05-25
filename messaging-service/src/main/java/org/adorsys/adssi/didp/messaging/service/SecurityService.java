@@ -19,7 +19,7 @@ public class SecurityService {
     }
 
     public void assertSignature(String providedSignature, String sender, String recipient, String messageId, Instant timestamp, String key) {
-        assertSignature(providedSignature, sender, recipient, messageId, timestamp, key, "");
+        assertSignature(providedSignature, sender, recipient, messageId, timestamp, "", key);
     }
 
     public void assertSignature(String providedSignature, String sender, String recipient, String messageId, Instant timestamp, String payload, String key) {
@@ -31,9 +31,7 @@ public class SecurityService {
             throw new ExpiredPopSignature();
         }
 
-        var expectedSignature = signatureService.signature(sender, recipient, messageId, timestamp.toString(), payload, key);
-
-        if (!expectedSignature.equals(providedSignature)) {
+        if (!signatureService.verifySignature(new SignatureService.Verification(sender, recipient, messageId, timestamp.toString(), payload), key, providedSignature)) {
             throw new InvalidPopSignature();
         }
     }

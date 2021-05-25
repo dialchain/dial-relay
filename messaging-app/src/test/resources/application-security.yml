@@ -4,5 +4,4 @@ didp:
       signature:
         ttl: PT1M
         enabled: true
-        digest: SHA2_512
-        bits: 60
+        algorithm: EdDSA

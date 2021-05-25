@@ -1,11 +1,21 @@
 package org.adorsys.adssi.didp.messaging.service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.Ed25519Verifier;
+import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.util.Base64URL;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.adorsys.adssi.didp.messaging.config.SecurityConfig;
-import org.adorsys.udf.UDF;
+import org.adorsys.adssi.twindow.crypto.Ed25519VerificationKey2018Service;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeTypeUtils;
 
-import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.util.Map;
 
 @Service
 public class SignatureService {
@@ -16,14 +26,33 @@ public class SignatureService {
         this.securityConfig = securityConfig;
     }
 
-    public String signature(String sender, String recipient, String messageId, String timestamp, String payload, String key) {
-        var canonicalString = String.format("%s,%s,%s,%s,%s", sender, recipient, messageId, timestamp, payload);
-        return UDF.contentDigestOfDataString(
-                canonicalString.getBytes(StandardCharsets.UTF_8),
-                MimeTypeUtils.TEXT_PLAIN_VALUE,
-                securityConfig.getBits(),
-                securityConfig.getDigest(),
-                key
-            );
+    public boolean verifySignature(Verification verification, String key, String providedSignature) {
+        OctetKeyPair signingKey = Ed25519VerificationKey2018Service.publicKeyFromBase58(key, "dummy");
+        var jwsHeader = new JWSHeader(securityConfig.getAlgorithm());
+        var jwsPayload = new Payload(
+                Map.of(
+                        "senderId", verification.getSender(),
+                        "recipientId", verification.getRecipient(),
+                        "messageId", verification.getMessageId(),
+                        "timestamp", verification.getTimestamp(),
+                        "payload", verification.getPayload()
+                )
+        );
+
+        try {
+            return new JWSObject(jwsHeader.toBase64URL(), jwsPayload, Base64URL.from(providedSignature)).verify(new Ed25519Verifier(signingKey));
+        } catch (JOSEException| ParseException ex) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class Verification {
+        private final String sender;
+        private final String recipient;
+        private final String messageId;
+        private final String timestamp;
+        private final String payload;
     }
 }

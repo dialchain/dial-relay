@@ -1,71 +1,224 @@
 package org.adorsys.adssi.didp.messaging.app;
 
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.Ed25519Signer;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.OctetKeyPair;
+import org.adorsys.adssi.twindow.crypto.Common25519Service;
+import org.adorsys.adssi.twindow.crypto.Ed25519VerificationKey2018Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.adorsys.adssi.didp.messaging.resource.MessageResource.PROOF_OF_POSSESSION_HEADER;
 import static org.adorsys.adssi.didp.messaging.resource.MessageResource.PROOF_OF_POSSESSION_TIMESTAMP_HEADER;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = MessagingApplication.class)
-@ContextConfiguration(classes = {MapStoreConfig.class})
-@ActiveProfiles("security")
+@ActiveProfiles({"security", "test"})
 public class MessagingSecurityTest {
 
     private static final String BASE_PATH = "/messages/";
+
+    private final OctetKeyPair senderKey = Ed25519VerificationKey2018Service.generateKeyPair("k1");
+    private final OctetKeyPair recipientKey = Ed25519VerificationKey2018Service.generateKeyPair("k2");
+    private final Common25519Service commonSvc = new Common25519Service(Curve.Ed25519);
+    private final String senderPub58 = commonSvc.publicKeyBase58(senderKey);
+    private final String recipientPub58 = commonSvc.publicKeyBase58(recipientKey);
+    private final String messageId = UUID.randomUUID().toString();
+    private final String payload = UUID.randomUUID().toString();
 
     @Autowired
     private MockMvc mvc;
 
     @Test
     void testSendWithOkSignature() throws Exception {
-        doGet("1/2/3", "1", Instant.now().toString());
+        var time = Instant.now().toString();
+        doPost(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, payload, senderKey),
+                time,
+                payload
+        ).andExpect(status().isOk());
     }
 
     @Test
-    void testSendWithNokSignature() {
+    void testSendWithNokSignature() throws Exception {
+        var time = Instant.now().toString();
+        doPost(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, payload, senderKey) + "TAMPER",
+                time,
+                payload
+        ).andExpect(status().isUnauthorized());
     }
 
     @Test
-    void testReceiveWithOkSignature() {
+    void testSendWithOutdatedSignature() throws Exception {
+        var time = Instant.now().minus(Duration.ofDays(10)).toString();
+        doPost(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, payload, senderKey),
+                time,
+                payload
+        ).andExpect(status().isForbidden());
     }
 
     @Test
-    void testReceiveWithNokSignature() {
+    void testReceiveWithOkSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().toString();
+        doGet(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey),
+                time
+        ).andExpect(status().isOk()).andExpect(content().string(payload));
     }
 
     @Test
-    void testReceiveMultiWithOkSignature() {
+    void testReceiveWithNokSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().toString();
+        doGet(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey) + "TAMPER",
+                time
+        ).andExpect(status().isUnauthorized());
     }
 
     @Test
-    void testReceiveMultiWithNokSignature() {
+    void testReceiveWithOutdatedSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().minus(Duration.ofDays(10)).toString();
+        doGet(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey),
+                time
+        ).andExpect(status().isForbidden());
     }
 
     @Test
-    void testDeleteWithOkSignature() {
+    void testReceiveMultiWithOkSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().toString();
+        doGet(
+                String.format("%s/%s/multiple/%s,%s", senderPub58, recipientPub58, messageId, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey)
+                        + "," + signature(senderPub58, recipientPub58, messageId, time, "", recipientKey),
+                time
+        ).andExpect(status().isOk()).andExpect(jsonPath(messageId).value(payload));
     }
 
     @Test
-    void testDeleteWithNokSignature() {
+    void testReceiveMultiWithNokSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().toString();
+        doGet(
+                String.format("%s/%s/multiple/%s,%s", senderPub58, recipientPub58, messageId, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey) + "TAMPER"
+                        + "," + signature(senderPub58, recipientPub58, messageId, time, "", recipientKey),
+                time
+        ).andExpect(status().isUnauthorized());
     }
 
-    protected ResultActions doGet(String path, String signature, String timestamp) throws Exception {
+    @Test
+    void testReceiveMultiWithOutdatedSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().minus(Duration.ofDays(10)).toString();
+        doGet(
+                String.format("%s/%s/multiple/%s,%s", senderPub58, recipientPub58, messageId, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey)
+                        + "," + signature(senderPub58, recipientPub58, messageId, time, "", recipientKey),
+                time
+        ).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testDeleteWithOkSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().toString();
+        doDelete(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey),
+                time
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    void testDeleteWithNokSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().toString();
+        doDelete(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey) + "TAMPER",
+                time
+        ).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void testDeleteWithOutdatedSignature() throws Exception {
+        testSendWithOkSignature();
+        var time = Instant.now().minus(Duration.ofDays(10)).toString();
+        doDelete(
+                String.format("%s/%s/%s", senderPub58, recipientPub58, messageId),
+                signature(senderPub58, recipientPub58, messageId, time, "", recipientKey),
+                time
+        ).andExpect(status().isForbidden());
+    }
+
+    private ResultActions doGet(String path, String signature, String timestamp) throws Exception {
         return mvc.perform(
                 get(BASE_PATH + path)
                         .header(PROOF_OF_POSSESSION_HEADER, signature)
                         .header(PROOF_OF_POSSESSION_TIMESTAMP_HEADER, timestamp)
-        ).andExpect(status().isOk());
+        );
+    }
+
+    private ResultActions doPost(String path, String signature, String timestamp, String payload) throws Exception {
+        return mvc.perform(
+                post(BASE_PATH + path)
+                        .header(PROOF_OF_POSSESSION_HEADER, signature)
+                        .header(PROOF_OF_POSSESSION_TIMESTAMP_HEADER, timestamp)
+                        .content(payload)
+        );
+    }
+
+    private ResultActions doDelete(String path, String signature, String timestamp) throws Exception {
+        return mvc.perform(
+                delete(BASE_PATH + path)
+                        .header(PROOF_OF_POSSESSION_HEADER, signature)
+                        .header(PROOF_OF_POSSESSION_TIMESTAMP_HEADER, timestamp)
+        );
+    }
+
+    private String signature(String senderPubKey, String recipientPubKey, String messageId, String timestamp, String payload, OctetKeyPair key) throws Exception {
+        var jwsHeader = new JWSHeader(JWSAlgorithm.EdDSA);
+        var jwsPayload = new Payload(
+                Map.of(
+                        "senderId", senderPubKey,
+                        "recipientId", recipientPubKey,
+                        "messageId", messageId,
+                        "timestamp", timestamp,
+                        "payload", payload
+                )
+        );
+
+        var jwe = new JWSObject(jwsHeader, jwsPayload);
+        jwe.sign(new Ed25519Signer(key));
+        return jwe.getSignature().toString();
     }
 }

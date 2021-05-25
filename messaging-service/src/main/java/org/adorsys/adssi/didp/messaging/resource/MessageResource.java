@@ -54,7 +54,7 @@ public class MessageResource {
         final @RequestBody String message,
         final @RequestHeader(PROOF_OF_POSSESSION_HEADER) String senderPopHeader,
         final @RequestHeader(PROOF_OF_POSSESSION_TIMESTAMP_HEADER) Instant popTimestamp) {
-        securityService.assertSignature(senderPopHeader, sender, recipient, messageId, popTimestamp, sender);
+        securityService.assertSignature(senderPopHeader, sender, recipient, messageId, popTimestamp, message, sender);
         return messageService.set(sender, recipient, messageId, message);
     }
 

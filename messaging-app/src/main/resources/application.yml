@@ -23,6 +23,5 @@ didp:
     security:
       signature:
         ttl: PT1M
-        enabled: false
-        digest: SHA2_512
-        bits: 60
+        enabled: false # Disable until Mobile app is ready
+        algorithm: EdDSA
