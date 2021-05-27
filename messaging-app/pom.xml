@@ -2,21 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.adorsys.adssi</groupId>
+		<groupId>com.plooh.adssi</groupId>
 		<artifactId>didp-messaging</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>didp-messaging-app</artifactId>
 	<name>didp-messaging-app</name>
-	<description>Adorsys Secure Wallet Messaging Application</description>
+	<description>Plooh Secure Wallet Messaging Application</description>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.adorsys.adssi</groupId>
+			<groupId>com.plooh.adssi</groupId>
 			<artifactId>store-redis</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.adorsys.adssi</groupId>
+			<groupId>com.plooh.adssi</groupId>
 			<artifactId>didp-messaging-service</artifactId>
 		</dependency>
 
@@ -52,7 +52,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.adorsys.adssi</groupId>
+			<groupId>com.plooh.adssi</groupId>
 			<artifactId>store-map</artifactId>
 			<scope>test</scope>
 		</dependency>

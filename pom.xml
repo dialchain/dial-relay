@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>org.adorsys.adssi</groupId>
+	<groupId>com.plooh.adssi</groupId>
 	<artifactId>didp-messaging</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>didp-messaging</name>
-	<description>Adorsys Secure Wallet Messaging parent</description>
+	<description>Plooh Secure Wallet Messaging parent</description>
 	<packaging>pom</packaging>
+	<url>https://github.com/aps-lab/didp-messaging</url>
 
-	<modules>
-		<module>messaging-service</module>
-		<module>messaging-app</module>
-	</modules>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://mit-license.org/</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Francis Pouatcha</name>
+			<email>francis.pouatcha@plooh.com</email>
+			<organizationUrl>https://github.com/aps-lab</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/aps-lab/didp-messaging.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/aps-lab/didp-messaging.git</developerConnection>
+		<url>https://github.com/aps-lab/didp-messaging</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<properties>
 		<java.version>11</java.version>
@@ -28,6 +44,11 @@
 		<lombok.version>1.18.16</lombok.version>
 	</properties>
 
+	<modules>
+		<module>messaging-service</module>
+		<module>messaging-app</module>
+	</modules>
+
 	<dependencyManagement>
 		<dependencies>
 			<!--https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-without-a-parent -->
@@ -40,17 +61,17 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.adorsys.adssi</groupId>
+				<groupId>com.plooh.adssi</groupId>
 				<artifactId>store-api</artifactId>
-				<version>${project.version}</version>
+				<version>0.0.4</version>
 			</dependency>
 			<dependency>
-				<groupId>org.adorsys.adssi</groupId>
+				<groupId>com.plooh.adssi</groupId>
 				<artifactId>store-redis</artifactId>
-				<version>${project.version}</version>
+				<version>0.0.4</version>
 			</dependency>
 			<dependency>
-				<groupId>org.adorsys.adssi</groupId>
+				<groupId>com.plooh.adssi</groupId>
 				<artifactId>didp-messaging-service</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -67,9 +88,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.adorsys.adssi</groupId>
+				<groupId>com.plooh.adssi</groupId>
 				<artifactId>store-map</artifactId>
-				<version>${project.version}</version>
+				<version>0.0.4</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -90,5 +111,100 @@
 			<url>https://repo.spring.io/milestone</url>
 		</pluginRepository>
 	</pluginRepositories>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<source>8</source>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.0.1</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+								<configuration>
+									<keyname>${gpg.keyname}</keyname>
+									<passphraseServerId>${gpg.keyname}</passphraseServerId>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
