@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.plooh.adssi</groupId>
 		<artifactId>didp-messaging</artifactId>
-		<version>0.0.1</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>didp-messaging-service</artifactId>
 	<name>didp-messaging-service</name>
