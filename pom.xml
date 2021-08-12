@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.plooh.adssi</groupId>
-	<artifactId>didp-messaging</artifactId>
+	<artifactId>dial-relay-java</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>didp-messaging</name>
-	<description>Plooh Secure Wallet Messaging parent</description>
+	<name>dial-relay-java</name>
+	<description>Plooh Secure Wallet Dial Relay parent</description>
 	<packaging>pom</packaging>
-	<url>https://github.com/aps-lab/didp-messaging</url>
+	<url>https://github.com/dialchain/dial-relay-java</url>
 
 	<licenses>
 		<license>
@@ -25,9 +25,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/aps-lab/didp-messaging.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/aps-lab/didp-messaging.git</developerConnection>
-		<url>https://github.com/aps-lab/didp-messaging</url>
+		<connection>scm:git:git://github.com/dialchain/dial-relay-java.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/dialchain/dial-relay-java.git</developerConnection>
+		<url>https://github.com/dialchain/dial-relay-java</url>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -45,8 +45,8 @@
 	</properties>
 
 	<modules>
-		<module>messaging-service</module>
-		<module>messaging-app</module>
+		<module>dial-relay-service</module>
+		<module>dial-relay-app</module>
 	</modules>
 
 	<dependencyManagement>
@@ -72,7 +72,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.plooh.adssi</groupId>
-				<artifactId>didp-messaging-service</artifactId>
+				<artifactId>dial-relay-service</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
