@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 
-class MessageResourceTest extends AbstractResourceTest {
+class MessageResourceIT extends AbstractResourceTest {
 
     @Test
     public void testNoMsg() throws Exception {
@@ -19,7 +19,6 @@ class MessageResourceTest extends AbstractResourceTest {
         String messageId = UUID.randomUUID().toString();
         checkNoMessage(sender, recipient, messageId);
     }
-
 
     @Test
     public void testReceiveMultiple() throws Exception {

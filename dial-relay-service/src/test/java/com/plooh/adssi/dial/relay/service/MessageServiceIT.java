@@ -1,36 +1,29 @@
 package com.plooh.adssi.dial.relay.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.plooh.adssi.store.api.StringStore;
-import com.plooh.adssi.store.map.MapStringStore;
+import com.plooh.adssi.dial.relay.MessagingApplicationTests;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class MessageServiceTest {
+class MessageServiceIT extends MessagingApplicationTests {
 
-    private Long expSec = 172800L;
-    private StringStore store = new MapStringStore();
-
-    private MessageService uut;
-
-    @BeforeAll
-    void setUp() {
-        uut = new MessageService(store, expSec);
-    }
+    @Autowired
+    private MessageService messageService;
 
     @Test
     public void testSetSingleEntry() {
         String message = RandomStringUtils.randomAlphabetic(100);
         String messageId = UUID.randomUUID().toString();
-        Boolean result = uut.set("+61-455-5248-21", "+43-664-5554-8121", messageId, message);
+		Boolean result = messageService.set("+61-455-5248-21", "+43-664-5554-8121", messageId, message);
         assertTrue(result);
     }
 
@@ -40,9 +33,9 @@ public class MessageServiceTest {
         String recipient = "+32-456-5554-98";
         String message = RandomStringUtils.randomAlphabetic(100);
         String messageId = UUID.randomUUID().toString();
-        Boolean result = uut.set(sender, recipient, messageId, message);
+		Boolean result = messageService.set(sender, recipient, messageId, message);
         assertTrue(result);
-        String messageReceived = uut.get(sender, recipient, messageId);
+        String messageReceived = messageService.get(sender, recipient, messageId);
         assertEquals(message, messageReceived);
     }
 
@@ -54,14 +47,14 @@ public class MessageServiceTest {
         String messageTwo = RandomStringUtils.randomAlphabetic(100);
         String messageOneId = UUID.randomUUID().toString();
         String messageTwoId = UUID.randomUUID().toString();
-        uut.set(sender, recipient, messageOneId, messageOne);
-        uut.set(sender, recipient, messageTwoId, messageTwo);
+		messageService.set(sender, recipient, messageOneId, messageOne);
+        messageService.set(sender, recipient, messageTwoId, messageTwo);
 
         Map<String, String> expectedMessages = new HashMap<>();
         expectedMessages.put(messageOneId, messageOne);
         expectedMessages.put(messageTwoId, messageTwo);
 
-        Map<String, String> receivedMessages = uut.get(sender, recipient, List.of(messageOneId, messageTwoId));
+        Map<String, String> receivedMessages = messageService.get(sender, recipient, List.of(messageOneId, messageTwoId));
         assertEquals(receivedMessages, expectedMessages);
     }
 
@@ -71,13 +64,13 @@ public class MessageServiceTest {
         String recipient = "+1-416-5553-187";
         String message = RandomStringUtils.randomAlphabetic(100);
         String messageId = UUID.randomUUID().toString();
-        Boolean result = uut.set(sender, recipient, messageId, message);
+		Boolean result = messageService.set(sender, recipient, messageId, message);
         assertTrue(result);
-        String messageReceived = uut.get(sender, recipient, messageId);
+        String messageReceived = messageService.get(sender, recipient, messageId);
         assertEquals(message, messageReceived);
-        Boolean deletedFlag = uut.delete(sender, recipient, messageId);
+        Boolean deletedFlag = messageService.delete(sender, recipient, messageId);
         assertTrue(deletedFlag);
-        String noMessageReceived = uut.get(sender, recipient, messageId);
+        String noMessageReceived = messageService.get(sender, recipient, messageId);
         assertNull(noMessageReceived);
     }
 
