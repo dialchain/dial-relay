@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest(classes = MessagingApplication.class)
 @ActiveProfiles({"security", "test"})
-public class MessagingSecurityTest {
+public class MessagingSecurityIT {
 
     private static final String BASE_PATH = "/messages/";
 

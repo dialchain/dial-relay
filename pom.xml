@@ -20,7 +20,12 @@
 		<developer>
 			<name>Francis Pouatcha</name>
 			<email>francis.pouatcha@plooh.com</email>
-			<organizationUrl>https://github.com/aps-lab</organizationUrl>
+			<organizationUrl>https://github.com/dialchain</organizationUrl>
+		</developer>
+		<developer>
+			<name>Willie Chieukam</name>
+			<email>willie.chieukam@plooh.com</email>
+			<organizationUrl>https://github.com/dialchain</organizationUrl>
 		</developer>
 	</developers>
 
@@ -42,6 +47,13 @@
 		<springdoc-openapi-ui.version>1.5.0</springdoc-openapi-ui.version>
 		<commons-lang3.version>3.11</commons-lang3.version>
 		<lombok.version>1.18.16</lombok.version>
+		<rest-assured.version>4.2.0</rest-assured.version>
+		<store-api.version>0.0.4</store-api.version>
+		<store-redis.version>0.0.4</store-redis.version>
+		<store-map.version>0.0.4</store-map.version>
+		<scmBranch/>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZZ</maven.build.timestamp.format>
+		<maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
 	</properties>
 
 	<modules>
@@ -63,12 +75,12 @@
 			<dependency>
 				<groupId>com.plooh.adssi</groupId>
 				<artifactId>store-api</artifactId>
-				<version>0.0.4</version>
+				<version>${store-api.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.plooh.adssi</groupId>
 				<artifactId>store-redis</artifactId>
-				<version>0.0.4</version>
+				<version>${store-redis.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.plooh.adssi</groupId>
@@ -90,41 +102,143 @@
 			<dependency>
 				<groupId>com.plooh.adssi</groupId>
 				<artifactId>store-map</artifactId>
-				<version>0.0.4</version>
+				<version>${store-map.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-		</repository>
-	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-		</pluginRepository>
-	</pluginRepositories>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+		<!-- Testing dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.plooh.adssi</groupId>
+			<artifactId>store-map</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- Die commit id bei "git log -abbrev-commit" ist ebenfalls 7 Zeichen. -->
+					<shortRevisionLength>7</shortRevisionLength>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Version>${project.version}_${maven.build.timestamp}
+							</Implementation-Version>
+							<Project-buildArtifact>${project.artifactId}</Project-buildArtifact>
+							<Project-buildVersion>${project.version}</Project-buildVersion>
+							<Project-buildTimestamp>${maven.build.timestamp}</Project-buildTimestamp>
+							<Project-buildNumber>${buildNumber}</Project-buildNumber>
+							<Project-buildScmBranch>${scmBranch}</Project-buildScmBranch>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>4.0.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<verbose>true</verbose>
+					<dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+				<configuration>
+					<excludes>
+						<exclude>**/*IT.java</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<phase>integration-test</phase>
+						<configuration>
+							<excludes>
+								<exclude>**/*Test.java</exclude>
+							</excludes>
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -178,6 +292,33 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<profiles>
 		<profile>

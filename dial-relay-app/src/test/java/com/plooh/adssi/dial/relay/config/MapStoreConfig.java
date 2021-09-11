@@ -1,4 +1,4 @@
-package com.plooh.adssi.dial.relay.app;
+package com.plooh.adssi.dial.relay.config;
 
 import com.plooh.adssi.store.api.StringStore;
 import com.plooh.adssi.store.map.MapStringStore;

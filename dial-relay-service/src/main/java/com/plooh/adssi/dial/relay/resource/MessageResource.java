@@ -2,6 +2,7 @@ package com.plooh.adssi.dial.relay.resource;
 
 import com.plooh.adssi.dial.relay.service.MessageService;
 import com.plooh.adssi.dial.relay.service.SecurityService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +47,7 @@ public class MessageResource {
         final @PathVariable("messageIds") String[] messageIds,
         final @RequestHeader(value = PROOF_OF_POSSESSION_HEADER,required = false) String recipientPopHeaders,
         final @RequestHeader(value = PROOF_OF_POSSESSION_TIMESTAMP_HEADER, required = false) Instant popTimestamp) {
-        var signatures = recipientPopHeaders.split(",");
+        var signatures= StringUtils.isNotBlank(recipientPopHeaders) ? recipientPopHeaders.split(",") : new String[messageIds.length];
         IntStream.range(0, messageIds.length)
             .forEach(pos -> securityService.assertSignature(signatures[pos], sender, recipient, messageIds[pos], popTimestamp, recipient));
         return messageService.get(sender, recipient, List.of(messageIds));
