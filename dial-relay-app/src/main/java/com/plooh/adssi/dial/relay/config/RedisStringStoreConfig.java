@@ -1,12 +1,12 @@
 package com.plooh.adssi.dial.relay.config;
 
 import com.plooh.adssi.store.redis.RedisStoreConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
+@ConditionalOnProperty(name = "dial.relay.store.redis.enabled", havingValue = "true")
 @ComponentScan(basePackageClasses = RedisStoreConfig.class)
-@Profile("!test")
-public class StoreConfig {
+public class RedisStringStoreConfig {
 }
