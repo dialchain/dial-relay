@@ -1,4 +1,12 @@
 package com.plooh.adssi.dial.relay.exceptions;
 
-public class InvalidPopSignature extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class InvalidPopSignature extends MessagingException {
+
+    @Override
+    public HttpStatus status() {
+        return HttpStatus.UNAUTHORIZED;
+    }
+
 }
