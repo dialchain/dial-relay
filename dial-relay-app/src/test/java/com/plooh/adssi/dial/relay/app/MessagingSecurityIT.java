@@ -7,13 +7,14 @@ import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.Ed25519Signer;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.plooh.adssi.dial.relay.config.MapStringStoreConfig;
 import com.plooh.adssi.twindow.crypto.Common25519Service;
 import com.plooh.adssi.twindow.crypto.Ed25519VerificationKey2018Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = MessagingApplication.class)
-@ActiveProfiles({"security", "test"})
+@ContextConfiguration(classes = {MapStringStoreConfig.class})
 public class MessagingSecurityIT {
 
     private static final String BASE_PATH = "/messages/";
