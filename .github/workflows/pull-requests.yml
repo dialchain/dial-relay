@@ -32,3 +32,24 @@ jobs:
         run: ./mvnw clean package
         env:
           MAVEN_OPTS: "-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120" # Github-on-Azure tweaks - https://github.com/actions/virtual-environments/issues/1499
+
+      #      - name: Configure AWS credentials
+      #        uses: aws-actions/configure-aws-credentials@v1
+      #        with:
+      #          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY_ID }}
+      #          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
+      #          aws-region: 'us-east-1'
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker images to ECR registry
+        id: build-image
+        #env:
+        #  IMAGE_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        #  IMAGE_TAG: ${{ github.sha }}
+        run: |
+            docker build -t "public.ecr.aws/s6b0c4h3/dial-relay:latest" .
+            docker push "public.ecr.aws/s6b0c4h3/dial-relay:latest"
+            #echo "::set-output name=image-${PROJECTS[$i]}::$image"
