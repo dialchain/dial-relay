@@ -5,7 +5,6 @@ on:
   pull_request:
     branches:
       - master
-      - deploy-image
 
 jobs:
   build:
@@ -41,17 +40,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: 'us-east-1'
 
-      #      - name: Login to Amazon ECR
-      #        id: login-ecr
-      #        uses: aws-actions/amazon-ecr-login@v1
-
       - name: Build and push Docker images to ECR registry
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: dial-relay
-          IMAGE_TAG: ${{ github.sha }}
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          ECR_REPOSITORY: "dial-relay"
+          IMAGE_TAG: "latest"
         run: |
-          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s6b0c4h3
-          docker build -t dial-relay .
-          docker tag dial-relay:latest public.ecr.aws/s6b0c4h3/dial-relay:latest
-          docker push public.ecr.aws/s6b0c4h3/dial-relay:latest
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+          docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} .
+          docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
