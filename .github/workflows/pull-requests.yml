@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -41,9 +41,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: 'us-east-1'
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      #      - name: Login to Amazon ECR
+      #        id: login-ecr
+      #        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build and push Docker images to ECR registry
         env:
@@ -51,5 +51,7 @@ jobs:
           ECR_REPOSITORY: dial-relay
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s6b0c4h3
+          docker build -t dial-relay .
+          docker tag dial-relay:latest public.ecr.aws/s6b0c4h3/dial-relay:latest
+          docker push public.ecr.aws/s6b0c4h3/dial-relay:latest
