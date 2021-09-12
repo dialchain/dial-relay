@@ -1,4 +1,12 @@
 package com.plooh.adssi.dial.relay.exceptions;
 
-public class ExpiredPopSignature extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class ExpiredPopSignature extends MessagingException {
+
+    @Override
+    public HttpStatus status() {
+        return HttpStatus.FORBIDDEN;
+    }
+
 }
