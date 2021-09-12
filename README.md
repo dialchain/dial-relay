@@ -1,4 +1,5 @@
 # README
+[![Master branch build](https://github.com/dialchain/dial-relay-java/actions/workflows/master-push-merge.yml/badge.svg)](https://github.com/dialchain/dial-relay-java/actions/workflows/master-push-merge.yml)
 
 ## Start Redis
 
