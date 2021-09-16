@@ -10,18 +10,18 @@ import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "dial.relay.store.map.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "dial.relay.store.name", havingValue = "map", matchIfMissing = true)
 public class MapStringStoreConfig {
 
-    @Value("${dial.relay.store.map.maxSize}")
+    @Value("${dial.relay.store.maxSize:1000000}")
     private int maxSize;
 
-    @Value("${dial.relay.store.map.durationInSeconds}")
+    @Value("${dial.relay.store.durationInSeconds:172800}")
     private int durationInSeconds;
 
     @Bean
     StringStore mapStringOperations() {
-        log.info("Starting the Expiring Map Store...");
+        log.info("=== USED Store: EXPIRING MAP ===");
         return new MapStringStore(maxSize, durationInSeconds);
     }
 
