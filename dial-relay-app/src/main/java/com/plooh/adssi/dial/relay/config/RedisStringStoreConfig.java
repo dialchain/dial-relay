@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(name = "dial.relay.store.redis.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "dial.relay.store.name", havingValue = "redis")
 @ComponentScan(basePackageClasses = RedisStoreConfig.class)
 public class RedisStringStoreConfig {
 }

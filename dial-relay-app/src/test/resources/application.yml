@@ -6,7 +6,3 @@ dial:
           ttl: PT1M
           enabled: true
           algorithm: EdDSA
-    map:
-      enabled: true
-      maxSize: 1000000
-      durationInSeconds: 1800 # 30 min
