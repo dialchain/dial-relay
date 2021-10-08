@@ -1,6 +1,5 @@
-package com.plooh.adssi.dial.relay.resource;
+package com.plooh.adssi.dial.relay.exceptions;
 
-import com.plooh.adssi.dial.relay.exceptions.MessagingException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -16,11 +15,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class MessagingControllerAdvice {
+public class DialRelayControllerAdvice {
 
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Void> handleMessagingException(MessagingException e) {
+    public ResponseEntity<Void> handleMessagingException(DialRelayException e) {
         log.info("{}: {}", e.getClass().getSimpleName(), e.getMessage());
         return new ResponseEntity<>(e.status());
     }

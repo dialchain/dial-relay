@@ -7,6 +7,7 @@ import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.Ed25519Verifier;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import com.plooh.adssi.dial.relay.config.SecurityConfig;
@@ -16,14 +17,11 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.util.Map;
 
+@AllArgsConstructor
 @Service
 public class SignatureService {
 
     private final SecurityConfig securityConfig;
-
-    public SignatureService(SecurityConfig securityConfig) {
-        this.securityConfig = securityConfig;
-    }
 
     public boolean verifySignature(Verification verification, String key, String providedSignature) {
         OctetKeyPair signingKey = Ed25519VerificationKey2018Service.publicKeyFromBase58(key, "dummy");
