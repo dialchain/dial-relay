@@ -26,6 +26,6 @@
     <logger name="ch.qos.logback" level="ERROR" />
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
+<!--        <appender-ref ref="FILE"/>-->
     </root>
 </configuration>
