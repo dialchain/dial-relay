@@ -22,7 +22,9 @@ public class MapStringStoreConfig {
     @Bean
     StringStore mapStringOperations() {
         log.info("=== USED Store: EXPIRING MAP ===");
-        return new MapStringStore(maxSize, durationInSeconds);
+
+        return new MapStringStore(maxSize, durationInSeconds)
+            .addAsyncExpirationListener((key, value) -> log.warn("MapStringStore - Removing entry: {}", key));
     }
 
 }

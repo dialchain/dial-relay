@@ -22,7 +22,7 @@ public class SecurityService {
     @PostConstruct
     public void init() {
         if (BooleanUtils.isFalse(securityConfig.getEnabled())) {
-            log.info("=== Messages validation is actually deactivate ===");
+            log.info("=== Messages validation is actually deactivated... ===");
         }
     }
 

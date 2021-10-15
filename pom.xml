@@ -48,9 +48,9 @@
 		<commons-lang3.version>3.11</commons-lang3.version>
 		<lombok.version>1.18.16</lombok.version>
 		<rest-assured.version>4.2.0</rest-assured.version>
-		<store-api.version>0.0.7</store-api.version>
-		<store-redis.version>0.0.7</store-redis.version>
-		<store-map.version>0.0.7</store-map.version>
+		<store-api.version>0.0.8</store-api.version>
+		<store-redis.version>0.0.8</store-redis.version>
+		<store-map.version>0.0.8</store-map.version>
 		<scmBranch/>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZZ</maven.build.timestamp.format>
 		<maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
