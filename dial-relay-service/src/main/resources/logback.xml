@@ -2,10 +2,6 @@
 <configuration>
     <property name="CONSOLE_LOG_PATTERN"
               value="%d{yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS} %5p [%15.15t{14}] %-40.40logger{39} :  %msg%n%wex"/>
-<!--    <property name="FILE_LOG_PATTERN"-->
-<!--              value="%-4relative [%thread] %-5level %logger{35} - %msg%n%wex"/>-->
-<!--    <property name="LOG_FILE"-->
-<!--              value="${LOG_PATH:-.}/dial-relay.log"/>-->
     <conversionRule conversionWord="wex"
                     converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -13,19 +9,8 @@
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
-<!--    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
-<!--        <file>${LOG_FILE}</file>-->
-<!--        <rollingPolicy-->
-<!--                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
-<!--            <fileNamePattern>${LOG_FILE}_%d{yyyy-MM-dd, Etc/UTC}</fileNamePattern>-->
-<!--        </rollingPolicy>-->
-<!--        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
-<!--            <pattern>${FILE_LOG_PATTERN}</pattern>-->
-<!--        </encoder>-->
-<!--    </appender>-->
     <logger name="ch.qos.logback" level="ERROR" />
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-<!--        <appender-ref ref="FILE"/>-->
     </root>
 </configuration>
