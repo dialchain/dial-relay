@@ -18,6 +18,10 @@ management:
       exposure:
         include: health
 
+  health:
+    redis:
+      enabled: false
+
 dial:
   relay:
     messaging:
