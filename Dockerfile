@@ -11,6 +11,7 @@ WORKDIR /app
 ENV APP_PORT=9092
 
 COPY --from=NewRelicInstall /newrelic/newrelic ./newrelic
-COPY dial-relay-app/target/dial-relay-app-*-SNAPSHOT.jar ./dial-relay-app.jar
+COPY target/dial-relay-app-*-SNAPSHOT.jar ./dial-relay-app.jar
+#COPY dial-relay-app/target/dial-relay-app-*-SNAPSHOT.jar ./dial-relay-app.jar
 
 CMD exec java $JAVA_OPTS -javaagent:newrelic/newrelic.jar -jar ./dial-relay-app.jar --server.port=$APP_PORT
