@@ -77,6 +77,9 @@ jobs:
           name: jar-artifact
 
       - run: ls .
+      - run: ls dial-relay-app
+      - run: ls dial-relay-service
+      - run: ls target
       #
       #      - uses: google-github-actions/setup-gcloud@master
       #
