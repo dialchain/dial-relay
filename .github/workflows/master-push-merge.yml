@@ -33,10 +33,10 @@ jobs:
         env:
           MAVEN_OPTS: "-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120" # Github-on-Azure tweaks - https://github.com/actions/virtual-environments/issues/1499
 
-      #      - uses: actions/upload-artifact@v2
-      #        with:
-      #          name: jar-artifact
-      #          path: ./dial-relay-app/target/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: jar-artifact
+          path: dial-relay-app/target/
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -66,15 +66,17 @@ jobs:
           image_name: "dial-relay"
           image_tag: "latest"
 
-      #  build-and-push-to-gcr:
-      #    needs: [build]
-      #    runs-on: ubuntu-latest
-      #    steps:
-      #      - uses: actions/checkout@v2
-      #
-      #      - uses: actions/download-artifact@v2
-      #        with:
-      #          name: jar-artifact
+  build-and-push-to-gcr:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: jar-artifact
+
+      - run: ls dial-relay-app/target/
       #
       #      - uses: google-github-actions/setup-gcloud@master
       #
