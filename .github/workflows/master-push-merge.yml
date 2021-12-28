@@ -38,34 +38,6 @@ jobs:
           name: jar-artifact
           path: dial-relay-app
 
-        #      - name: Configure AWS credentials
-        #        uses: aws-actions/configure-aws-credentials@v1
-        #        with:
-        #          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        #          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #          aws-region: 'us-east-1'
-        #
-        #      - name: Build and push Docker images to ECR registry
-        #        env:
-        #          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
-        #          ECR_REPOSITORY: "dial-relay"
-        #          IMAGE_TAG: "latest"
-        #        run: |
-        #          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-        #          docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} .
-        #          docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
-
-        #      - uses: google-github-actions/setup-gcloud@master
-        #
-        #      - name: build and push to GCP registry
-        #        uses: RafikFarhad/push-to-gcr-github-action@v4
-        #        with:
-        #          gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
-        #          registry: "eu.gcr.io"
-        #          project_id: "ploohid"
-        #          image_name: "dial-relay"
-        #          image_tag: "latest"
-
   build-and-push-to-aws:
     needs: [build]
     runs-on: ubuntu-latest
